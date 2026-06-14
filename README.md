@@ -39,14 +39,11 @@ default         192.168.20.1    0.0.0.0         UG    601    0        0 wlan0
 ```
 
 ```
-$ netstat -an | grep LISTEN | grep tcp\
 $ netstat -an | grep tcp\  | grep LISTEN
-tcp        0      0 127.0.0.1:22            0.0.0.0:*               LISTEN
-tcp        0      0 127.0.0.1:53            0.0.0.0:*               LISTEN
-tcp        0      0 10.1.3.1:53             0.0.0.0:*               LISTEN
-tcp        0      0 10.1.3.1:22             0.0.0.0:*               LISTEN
-tcp        0      0 10.1.2.1:22             0.0.0.0:*               LISTEN
+tcp        0      0 0.0.0.0:22              0.0.0.0:*               LISTEN
 tcp        0      0 10.1.2.1:53             0.0.0.0:*               LISTEN
+tcp        0      0 10.1.3.1:53             0.0.0.0:*               LISTEN
+tcp        0      0 127.0.0.1:53            0.0.0.0:*               LISTEN
 ```
 
 ## Implementation
@@ -231,17 +228,6 @@ to display QR code to test phone access.
 ## Next Steps
 
 Optional steps
-
-### Restrict SSHD interfaces
-
-You can restrict the networks that `sshd` listens on to exclude the `WAN`.
-
-```
-# cat /etc/ssh/sshd_config.d/90-evo5.conf
-ListenAddress 10.1.2.1
-ListenAddress 10.1.3.1
-ListenAddress 127.0.0.1
-```
 
 ### Install Docker
 
