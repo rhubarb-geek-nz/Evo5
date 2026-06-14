@@ -5,7 +5,7 @@ Network Management Server
 The goal is to build a headless network management server that can act as a bridge between the cruel world outside and a safe haven subnet you want to work within.
 
 ## History
-My first machine performing this role as a [Compaq Evo D510](https://en.wikipedia.org/wiki/Compaq_Evo). This managed the subnet in my shed and had a wireless uplink to the house. The network that it oversaw contained two 6' 19" racks with various Unix boxes from yesteryear. I replaced it with a [Raspberry Pi 3](https://www.raspberrypi.com/products/raspberry-pi-3-model-b/) along with a [TP-Link Wireless Nano Router](https://www.tp-link.com/au/home-networking/wifi-router/tl-wr802n/). This is now being replaced by a [Raspberry Pi 5](https://www.raspberrypi.com/products/raspberry-pi-5/) along with a [Raspberry Pi USB WiFi Dongle](https://www.raspberrypi.com/products/raspberry-pi-usb-wifi-dongle/).
+My first machine performing this role was a [Compaq Evo D510](https://en.wikipedia.org/wiki/Compaq_Evo). This managed the subnet in my shed and had a wireless uplink to the house. The network that it oversaw contained two 6' 19" racks with various Unix boxes from yesteryear. I replaced it with a [Raspberry Pi 3](https://www.raspberrypi.com/products/raspberry-pi-3-model-b/) along with a [TP-Link Wireless Nano Router](https://www.tp-link.com/au/home-networking/wifi-router/tl-wr802n/). This is now being replaced by a [Raspberry Pi 5](https://www.raspberrypi.com/products/raspberry-pi-5/) along with a [Raspberry Pi USB WiFi Dongle](https://www.raspberrypi.com/products/raspberry-pi-usb-wifi-dongle/).
 
 ## Network Architecture
 There are three subnets.
@@ -16,7 +16,7 @@ There are three subnets.
 
 The LAN subnet and WLAN subnet will route through the WLAN using NAT/MASQUERADE. Local devices can either use WiFi or ethernet and be able to access other local devices.
 
-## End state
+## End State
 The working network should look similar to the following tables.
 
 ```
@@ -36,6 +36,17 @@ default         192.168.20.1    0.0.0.0         UG    601    0        0 wlan0
 10.1.2.0        0.0.0.0         255.255.255.0   U     100    0        0 eth0
 10.1.3.0        0.0.0.0         255.255.255.0   U     602    0        0 wlan1
 192.168.20.0    0.0.0.0         255.255.255.0   U     601    0        0 wlan0
+```
+
+```
+$ netstat -an | grep LISTEN | grep tcp\
+$ netstat -an | grep tcp\  | grep LISTEN
+tcp        0      0 127.0.0.1:22            0.0.0.0:*               LISTEN
+tcp        0      0 127.0.0.1:53            0.0.0.0:*               LISTEN
+tcp        0      0 10.1.3.1:53             0.0.0.0:*               LISTEN
+tcp        0      0 10.1.3.1:22             0.0.0.0:*               LISTEN
+tcp        0      0 10.1.2.1:22             0.0.0.0:*               LISTEN
+tcp        0      0 10.1.2.1:53             0.0.0.0:*               LISTEN
 ```
 
 ## Implementation
@@ -120,7 +131,7 @@ network:
 ```
 
 ### Configure the WLAN hotspot using nmcli
-The local Wifi needs to be created directly with nmcli rather than the netplan yaml. This has the advantage that hostapd is not required.
+The local Wifi needs to be created directly with `nmcli` rather than the netplan yaml. This has the advantage that hostapd is not required.
 
 First, determine the encoded password for your new local hotspot.
 
@@ -193,7 +204,7 @@ These rules do the following
 * Route from LAN to WAN
 * Route from WLAN to WAN
 
-Reboot and confirm all comes back and the `route` and `nmcli` connections look consistent. Refer to the tables shown in the **End state** section.
+Reboot and confirm all comes back and the `route` and `nmcli` connections look consistent. Refer to the tables shown in the [End State](#end-state) section.
 
 ## Final wrap-up
 
@@ -216,3 +227,26 @@ Connect mobile telephone to WLAN hotspor, confirm able to login wih password and
 ```
 
 to display QR code to test phone access.
+
+## Next Steps
+
+Optional steps
+
+### Restrict SSHD interfaces
+
+You can restrict the networks that `sshd` listens on to exclude the `WAN`.
+
+```
+# cat /etc/ssh/sshd_config.d/90-evo5.conf
+ListenAddress 10.1.2.1
+ListenAddress 10.1.3.1
+ListenAddress 127.0.0.1
+```
+
+### Install Docker
+
+The machine is a suitable host for running `docker` as a playground, see [Install Docker Engine on Debian](https://docs.docker.com/engine/install/debian/).
+
+### Use as a local GIT repository
+
+As a shared resource it is an convenient place to host local `git` repositories over `ssh`, for example see [Git on the Server](https://git-scm.com/book/en/v2/Git-on-the-Server-Setting-Up-the-Server).
