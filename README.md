@@ -225,6 +225,31 @@ Connect mobile telephone to WLAN hotspor, confirm able to login wih password and
 
 to display QR code to test phone access.
 
+## Emergency Recovery
+
+With the Raspberry Pi Imager it is simple to create multiple boot images. If you make a mistake in configuration you can recover by
+* using the power switch to safely shut down
+* boot from a second boot device
+* mount the offending media
+* fix the problem
+* shutdown
+* revert to the original boot media
+
+```
+# lsblk
+NAME   MAJ:MIN RM  SIZE RO TYPE MOUNTPOINTS
+sda      8:0    1 14.3G  0 disk
+├─sda1   8:1    1  512M  0 part /boot/firmware
+└─sda2   8:2    1 13.8G  0 part /
+sdb      8:16   1 59.4G  0 disk
+├─sdb1   8:17   1  512M  0 part
+└─sdb2   8:18   1 58.9G  0 part
+zram0  254:0    0    0B  0 disk
+# mount /dev/sdb2 /mnt
+# cd /mnt/etc/
+#
+```
+
 ## Next Steps
 
 Optional steps
