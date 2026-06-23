@@ -1,0 +1,9 @@
+[Unit]
+Description=Rhubarb Evo5 service
+After=network.target
+
+[Service]
+ExecStart=/usr/share/rhubarb-pi-evo5/etc/rc.local
+
+[Install]
+WantedBy=multi-user.target

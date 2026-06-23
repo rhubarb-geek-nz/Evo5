@@ -1,0 +1,22 @@
+#!/bin/sh -ex
+# Copyright (c) 2026 Roger Brown.
+# Licensed under the MIT License.
+
+while read TABLE RULE
+do
+	if iptables-save -t $TABLE | grep "^$RULE\$"
+	then
+		:
+	else
+		iptables -t $TABLE $RULE
+	fi
+done <<EOF
+nat -A POSTROUTING -o wlan0 -j MASQUERADE
+filter -A FORWARD -i eth0 -j ACCEPT
+filter -A FORWARD -i wlan1 -j ACCEPT
+EOF
+
+if test 0 -eq $(cat /proc/sys/net/ipv4/ip_forward)
+then
+	echo 1 > /proc/sys/net/ipv4/ip_forward
+fi

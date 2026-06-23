@@ -190,6 +190,7 @@ This defines both the LAN and WLAN subnets.
 The following commands can be put in `/etc/rc.local`
 
 ```
+echo 1 > /proc/sys/net/ipv4/ip_forward
 iptables -t nat -A POSTROUTING -o wlan0 -j MASQUERADE
 iptables -A FORWARD -i eth0 -j ACCEPT
 iptables -A FORWARD -i wlan1 -j ACCEPT
